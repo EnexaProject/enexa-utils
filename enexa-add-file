@@ -1,0 +1,22 @@
+#!/bin/sh
+set -eu
+
+FILE="$1"
+
+TARGET=$(mktemp --tmpdir="$ENEXA_WRITEABLE_DIRECTORY" --suffix ".$(basename "$FILE")" enexa.$(date +%s).XXXXXXXXXX)
+cp "$FILE" "$TARGET"
+
+NAME=$(echo "$TARGET" |perl -pe '$q = quotemeta $ENV{ENEXA_SHARED_DIRECTORY}; s/$q//')
+
+RESOURCE_URI=$(curl \
+    -s \
+    -o /dev/null --dump-header - \
+    -X POST \
+    "$ENEXA_SERVICE_URL"add-resource \
+    |awk '/^Content-Location: / { sub(/^[^:]+: /, ""); print }' |tr -d $'\r')
+
+curl \
+    -s \
+    -o /dev/null \
+    -X POST "$ENEXA_META_DATA_ENDPOINT" \
+    --data-urlencode "update=PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> INSERT DATA { <$RESOURCE_URI> enexa:location 'enexa-dir:/$NAME' }"
