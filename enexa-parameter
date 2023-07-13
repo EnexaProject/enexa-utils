@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+ENEXA_PARAMETER_IRI="$1"
+
+curl \
+    -s \
+    -H 'Accept: text/tab-separated-values' \
+    -G "$ENEXA_META_DATA_ENDPOINT" \
+    --data-urlencode "query=SELECT ?v { <$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> ?v }" \
+    |awk '(NR==2) { gsub(/^"|"$/, ""); print }'

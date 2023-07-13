@@ -1,0 +1,7 @@
+* ENEXA utils
+** Example usage
+#+begin_src shell :results output silent
+export ENEXA_META_DATA_ENDPOINT=https://dbpedia.org/sparql
+export ENEXA_MODULE_INSTANCE_IRI=http://dbpedia.org/resource/Lagomorpha
+perl -E 'say for @ARGV' -- "$(./enexa-parameter http://dbpedia.org/property/name)" "$(./enexa-parameter http://dbpedia.org/property/image)"
+#+end_src
