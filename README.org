@@ -11,11 +11,10 @@ export ENEXA_MODULE_INSTANCE_IRI=http://dbpedia.org/resource/Lagomorpha
 
 *** Result submission
 #+begin_src shell :results output silent
-./test-enexa-service &
-PID=$!
-docker run -d --rm -p 47238:3030 --name=test-enexa-fuseki -e ADMIN_PASSWORD=admin -e FUSEKI_DATASET_1=test stain/jena-fuseki >/dev/null
-sleep 5
+docker-compose up -d
+#+end_src
 
+#+begin_src shell :results output silent
 export ENEXA_SHARED_DIRECTORY=./test-shared-dir/
 export ENEXA_WRITEABLE_DIRECTORY=./test-shared-dir/"$(date +%s)"/
 mkdir -p "$ENEXA_SHARED_DIRECTORY"
@@ -25,7 +24,8 @@ export ENEXA_META_DATA_ENDPOINT=http://admin:admin@127.0.0.1:47238/test/update
 2>&1 ./enexa-add-file test-result-file
 
 curl -H 'Accept: text/tab-separated-values' -G "http://127.0.0.1:47238/test/" --data-urlencode "query=PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> SELECT ?s ?o { ?s enexa:location ?o }"
+#+end_src
 
-docker stop test-enexa-fuseki >/dev/null
-kill $PID
+#+begin_src shell :results output silent
+docker-compose down
 #+end_src
