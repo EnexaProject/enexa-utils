@@ -4,6 +4,6 @@ DIR="$(dirname "$(realpath "$0")")"/
 
 ENEXA_PARAMETER_IRI="$1"
 
-echo "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?v { {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> ?v FILTER(isLiteral(?v))} UNION {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> [rdf:value ?v]} }" \
+echo "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> SELECT ?v { {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> ?v FILTER(isLiteral(?v))} UNION {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> [rdf:value ?v]} UNION {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> [enexa:location ?l] BIND(REPLACE(?l, 'enexa-dir:/', '$ENEXA_SHARED_DIRECTORY') AS ?v)} }" \
 |"$DIR"/sparql-select "$ENEXA_META_DATA_ENDPOINT" \
 |awk '(NR==2) { gsub(/^"|"$/, ""); print }'
