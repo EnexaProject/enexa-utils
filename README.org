@@ -1,5 +1,11 @@
 * ENEXA utils
-** Example usage
+** Build
+#+begin_src shell :results output silent
+make build
+#+end_src
+That builds ~enexa-utils~ Docker image which is required to build modules.
+
+** Test
 *** Parameter retrieval
 #+begin_src shell :results output silent
 export ENEXA_META_DATA_ENDPOINT=https://dbpedia.org/sparql
@@ -29,3 +35,21 @@ echo "PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> SELECT ?o { 
 #+begin_src shell :results output silent
 docker-compose down
 #+end_src
+
+** Usage
+*** Docker
+In Dockerfile:
+#+begin_src
+FROM <your_application's_docker_image>
+COPY --from=enexa-utils:1 / /.
+#+end_src
+
+At runtime:
+#+begin_src shell
+echo $(enexa-parameter "http://example.org/input-parameter-1")
+echo your_result >your_output_file
+enexa-add-file your_output_file "http://example.org/output-parameter-2"
+#+end_src
+
+** Examples
+- [[../enexa-example-module][a simple example module]]
