@@ -1,5 +1,6 @@
 #!/bin/sh
 set -eu
+DIR="$(dirname "$(realpath "$0")")"/
 
 FILE="$1"
 
@@ -15,8 +16,7 @@ RESOURCE_URI=$(curl \
     "$ENEXA_SERVICE_URL"add-resource \
     |awk '/^Content-Location: / { sub(/^[^:]+: /, ""); print }' |tr -d $'\r')
 
-curl \
-    -s \
-    -o /dev/null \
-    -X POST "$ENEXA_META_DATA_ENDPOINT" \
-    --data-urlencode "update=PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> INSERT DATA { <$RESOURCE_URI> enexa:location 'enexa-dir:/$NAME' }"
+echo "PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> INSERT DATA { <$RESOURCE_URI> enexa:location 'enexa-dir:/$NAME' }" \
+     |"$DIR"/sparql-update "$ENEXA_META_DATA_ENDPOINT"
+
+echo "$RESOURCE_URI"

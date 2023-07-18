@@ -20,10 +20,10 @@ export ENEXA_WRITEABLE_DIRECTORY=./test-shared-dir/"$(date +%s)"/
 mkdir -p "$ENEXA_SHARED_DIRECTORY"
 mkdir -p "$ENEXA_WRITEABLE_DIRECTORY"
 export ENEXA_SERVICE_URL=http://127.0.0.1:36321/
-export ENEXA_META_DATA_ENDPOINT=http://admin:admin@127.0.0.1:47238/test/update
-2>&1 ./enexa-add-file test-result-file
+export ENEXA_META_DATA_ENDPOINT=http://admin:admin@127.0.0.1:47238/test
+URI=$(./enexa-add-file test-result-file)
 
-curl -H 'Accept: text/tab-separated-values' -G "http://127.0.0.1:47238/test/" --data-urlencode "query=PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> SELECT ?s ?o { ?s enexa:location ?o }"
+echo "PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> SELECT ?o { <$URI> enexa:location ?o }" |./sparql-select "http://admin:admin@127.0.0.1:47238/test"
 #+end_src
 
 #+begin_src shell :results output silent

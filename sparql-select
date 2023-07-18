@@ -1,0 +1,8 @@
+#!/bin/sh
+set -eu
+
+curl \
+    --silent \
+    --header 'Accept: text/tab-separated-values' \
+    --data-urlencode "query@-" \
+    --get "$1"
