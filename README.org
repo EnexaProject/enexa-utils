@@ -5,6 +5,18 @@ make build
 #+end_src
 That builds ~enexa-utils~ Docker image which is required to build modules.
 
+** Setup the test environment
+#+begin_src shell :results output silent
+docker-compose up -d
+#+end_src
+That would start Fuseki and a dummy ENEXA service.
+It is used for testing ~enexa-utils~ and modules.
+
+#+begin_src shell :results output silent
+docker-compose down
+#+end_src
+That would stop them.
+
 ** Test
 *** Parameter retrieval
 #+begin_src shell :results output silent
@@ -36,7 +48,7 @@ echo "PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> SELECT ?o { 
 docker-compose down
 #+end_src
 
-** Usage
+** Usage in modules
 *** Docker
 In Dockerfile:
 #+begin_src
@@ -44,10 +56,13 @@ FROM <your_application's_docker_image>
 COPY --from=enexa-utils:1 / /.
 #+end_src
 
-At runtime:
+In a module at runtime:
 #+begin_src shell
+# retrieve parameters
 echo $(enexa-parameter "http://example.org/input-parameter-1")
+# do useful things
 echo your_result >your_output_file
+# save result files
 enexa-add-file your_output_file "http://example.org/output-parameter-2"
 #+end_src
 
