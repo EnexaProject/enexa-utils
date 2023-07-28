@@ -17,6 +17,11 @@ docker-compose down
 #+end_src
 That would stop them.
 
+To clear the test SPARQL store:
+#+begin_src shell :results output silent
+echo "DELETE WHERE { ?s ?p ?o }" |./sparql-update "http://localhost:47238/test"
+#+end_src
+
 ** Test
 *** Parameter retrieval
 #+begin_src shell :results output silent
