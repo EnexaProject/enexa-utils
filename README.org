@@ -46,7 +46,7 @@ export ENEXA_SERVICE_URL=http://127.0.0.1:36321/
 export ENEXA_META_DATA_ENDPOINT=http://admin:admin@127.0.0.1:47238/test
 URI=$(./enexa-add-file test-result-file)
 
-echo "PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> SELECT ?o { <$URI> enexa:location ?o }" |./sparql-select "http://admin:admin@127.0.0.1:47238/test"
+echo "PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> SELECT ?o { <$URI> enexa:location ?o }" |./sparql-select "$ENEXA_META_DATA_ENDPOINT"
 #+end_src
 
 #+begin_src shell :results output silent
@@ -72,4 +72,5 @@ enexa-add-file your_output_file "http://example.org/output-parameter-2"
 #+end_src
 
 ** Examples
-- [[../enexa-example-module][a simple example module]]
+- [[https://github.com/EnexaProject/enexa-example-module][a simple example module]]
+- [[https://github.com/EnexaProject/enexa-dice-embeddings][DICE Embeddings]]
