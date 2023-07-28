@@ -5,8 +5,16 @@ DIR="$(dirname "$(realpath "$0")")"/
 FILE="$1"
 PROPERTY="${2:-}"
 
-TARGET=$(mktemp --tmpdir="$ENEXA_WRITEABLE_DIRECTORY" --suffix ".$(basename "$FILE")" enexa.$(date +%s).XXXXXXXXXX)
-cp "$FILE" "$TARGET"
+case "$FILE" in
+    "$ENEXA_SHARED_DIRECTORY"*)
+        TARGET="$FILE"
+        ;;
+    *)
+        mkdir -p "$ENEXA_MODULE_INSTANCE_DIRECTORY"
+        TARGET=$(mktemp --tmpdir="$ENEXA_MODULE_INSTANCE_DIRECTORY" --suffix ".$(basename "$FILE")" XXXXXXXXXX)
+        cp "$FILE" "$TARGET"
+        ;;
+esac
 
 NAME=$(echo "$TARGET" |perl -pe '$q = quotemeta $ENV{ENEXA_SHARED_DIRECTORY}; s/$q//')
 
