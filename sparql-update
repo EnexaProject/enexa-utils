@@ -4,5 +4,7 @@ set -eu
 curl \
     --silent \
     --output /dev/null \
+    --write-out "%{http_code}" \
     --data-urlencode "update@-" \
-    --request POST "$1"/update
+    --request POST "$1" \
+    |grep -q '^200$'
