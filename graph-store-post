@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+
+curl \
+    --silent \
+    --output /dev/null \
+    --write-out "%{http_code}" \
+    --header "Content-Type: text/turtle" \
+    --data "@-" \
+    --request POST "$1" \
+    |grep -q '^200$'
