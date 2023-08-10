@@ -1,4 +1,4 @@
-IMAGE:=hub.cs.upb.de/enexa/enexa-utils
+IMAGE:=hub.cs.upb.de/enexa/images/enexa-utils
 TAG:=$(IMAGE):1.0.0
 TAG2:=$(IMAGE):1.0
 TAG3:=$(IMAGE):1
