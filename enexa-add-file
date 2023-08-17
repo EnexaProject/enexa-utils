@@ -5,6 +5,7 @@ DIR="$(dirname "$(realpath "$0")")"/
 FILE="$1"
 PROPERTY="${2:-}"
 
+# Copy file if necessary
 case "$FILE" in
     "$ENEXA_SHARED_DIRECTORY"*)
         TARGET="$FILE"
@@ -18,19 +19,29 @@ esac
 
 NAME=$(echo "$TARGET" |perl -pe '$q = quotemeta $ENV{ENEXA_SHARED_DIRECTORY}; s/$q//')
 
+# Create request content
+CONTENT="@prefix enexa: <http://w3id.org/dice-research/enexa/ontology#> . _:new enexa:experiment <$ENEXA_EXPERIMENT_IRI> . "
+# If there are additional triples, append them
+if [ ! -z "$PROPERTY" ]; then
+    CONTENT="$CONTENT <$ENEXA_MODULE_INSTANCE_IRI> <$PROPERTY> _:new ."
+fi
+
 RESOURCE_URI=$(curl \
     -s \
     -o /dev/null --dump-header - \
     -X POST \
+    -H "Content-Type: text/turtle" \
+    --data-raw "$CONTENT" \
     "$ENEXA_SERVICE_URL"add-resource \
     |awk '/^Content-Location: / { sub(/^[^:]+: /, ""); print }' |tr -d $'\r')
 
-PROPERTY_TRIPLES=""
-if [ ! -z "$PROPERTY" ]; then
-    PROPERTY_TRIPLES="<$ENEXA_MODULE_INSTANCE_IRI> <$PROPERTY> <$RESOURCE_URI> ."
-fi
-
-echo "PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> INSERT DATA { <$RESOURCE_URI> enexa:location 'enexa-dir:/$NAME' . $PROPERTY_TRIPLES }" \
-     |"$DIR"/sparql-update "$ENEXA_META_DATA_ENDPOINT"
+# OLD APPROACH: send data to the SPARQL endpoint
+#PROPERTY_TRIPLES=""
+#if [ ! -z "$PROPERTY" ]; then
+#    PROPERTY_TRIPLES="<$ENEXA_MODULE_INSTANCE_IRI> <$PROPERTY> <$RESOURCE_URI> ."
+#fi
+#
+#echo "PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> INSERT DATA { <$RESOURCE_URI> enexa:location 'enexa-dir:/$NAME' . $PROPERTY_TRIPLES }" \
+#     |"$DIR"/sparql-update "$ENEXA_META_DATA_ENDPOINT"
 
 echo "$RESOURCE_URI"
