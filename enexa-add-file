@@ -17,10 +17,11 @@ case "$FILE" in
         ;;
 esac
 
+# Get path relative to the ENEXA shared directory
 NAME=$(echo "$TARGET" |perl -pe '$q = quotemeta $ENV{ENEXA_SHARED_DIRECTORY}; s/$q//')
 
 # Create request content
-CONTENT="@prefix enexa: <http://w3id.org/dice-research/enexa/ontology#> . _:new enexa:experiment <$ENEXA_EXPERIMENT_IRI> . "
+CONTENT="@prefix enexa: <http://w3id.org/dice-research/enexa/ontology#> . _:new enexa:location 'enexa-dir:/$NAME' . _:new enexa:experiment <$ENEXA_EXPERIMENT_IRI> . "
 # If there are additional triples, append them
 if [ ! -z "$PROPERTY" ]; then
     CONTENT="$CONTENT <$ENEXA_MODULE_INSTANCE_IRI> <$PROPERTY> _:new ."
