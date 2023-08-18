@@ -1,17 +1,30 @@
 #!/bin/sh
 OUTPUT=$(mktemp)
 
-curl \
+if type "curl" > /dev/null; then
+  # curl exists, so let's use it
+  curl \
     --silent --show-error \
     --output "$OUTPUT" \
     --write-out "%{http_code}" \
     --data-urlencode "update@-" \
     --request POST "$1" \
     |grep -q '^200$'
+else
+  # try wget
+  CONTENT_FILE=$(mktemp)
+  echo "update=" > $CONTENT_FILE
+  # read piped data and append to file
+  cat >> $CONTENT_FILE
+  wget -q --post-file "$CONTENT_FILE" -O "$OUTPUT" "$1"
+fi
 
 RET=$?
 
 if [ $RET -ne 0 ]; then
+    echo "Error while sending SPARQL update"
     cat $OUTPUT >&2
+else
+    echo "Successfully send a SPARQL update"
 fi
 exit $RET
