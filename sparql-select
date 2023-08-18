@@ -1,8 +1,18 @@
 #!/bin/sh
 set -eu
 
-curl \
+if type "curl" > /dev/null; then
+  # curl exists, so let's use it
+  curl \
     --silent \
     --header 'Accept: text/tab-separated-values' \
     --data-urlencode "query@-" \
     --get "$1"
+else
+  # try wget
+  CONTENT_FILE=$(mktemp)
+  echo "query=" > $CONTENT_FILE
+  # read piped data and append to file
+  cat >> $CONTENT_FILE
+  wget -q --header 'Accept: text/tab-separated-values' -O - --post-file "$CONTENT_FILE" "$1"
+fi
