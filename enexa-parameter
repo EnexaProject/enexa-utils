@@ -4,11 +4,18 @@ DIR="$(dirname "$(realpath "$0")")"/
 
 ENEXA_PARAMETER_IRI="$1"
 
-echo "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> SELECT ?v { \
+echo "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+PREFIX sd: <http://www.w3.org/ns/sparql-service-description#> 
+PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> 
+SELECT ?v {
+  GRAPH <http://example.org/meta-data> {
     {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> ?l FILTER(isLiteral(?l)) BIND(str(?l) AS ?v)}
     UNION
     {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> [rdf:value ?v]}
-    UNION {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> [enexa:location ?l] BIND(REPLACE(?l, 'enexa-dir:/', '$ENEXA_SHARED_DIRECTORY') AS ?v)}
-    }" \
+    UNION
+    {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> [sd:endpoint ?v]}
+    UNION 
+    {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> [enexa:location ?l] BIND(REPLACE(?l, 'enexa-dir:/', '$ENEXA_SHARED_DIRECTORY') AS ?v)}
+    }}" \
 |"$DIR"/sparql-select "$ENEXA_META_DATA_ENDPOINT" \
 |awk '(NR==2) { gsub(/^"|"$/, ""); print }'
