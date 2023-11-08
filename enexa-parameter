@@ -3,12 +3,23 @@ set -eu
 DIR="$(dirname "$(realpath "$0")")"/
 
 ENEXA_PARAMETER_IRI="$1"
+# If the graph is not set, use an empty string
+GRAPH="${ENEXA_META_DATA_GRAPH:-}"
 
-echo "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
+# If the graph variable is not set or it is emtpy
+if [ -z "$GRAPH" ]; then 
+  GRAPH_PART1=""
+  GRAPH_PART2=""  
+else
+  GRAPH_PART1="GRAPH <$GRAPH> {"
+  GRAPH_PART2="}"
+fi
+
+QUERY="PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> 
 PREFIX sd: <http://www.w3.org/ns/sparql-service-description#> 
 PREFIX enexa: <http://w3id.org/dice-research/enexa/ontology#> 
-SELECT ?v {
-  GRAPH <http://example.org/meta-data> {
+SELECT ?v WHERE {
+  $GRAPH_PART1
     {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> ?l FILTER(isLiteral(?l)) BIND(str(?l) AS ?v)}
     UNION
     {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> [rdf:value ?v]}
@@ -16,6 +27,11 @@ SELECT ?v {
     {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> [sd:endpoint ?v]}
     UNION 
     {<$ENEXA_MODULE_INSTANCE_IRI> <$ENEXA_PARAMETER_IRI> [enexa:location ?l] BIND(REPLACE(?l, 'enexa-dir:/', '$ENEXA_SHARED_DIRECTORY') AS ?v)}
-    }}" \
+  $GRAPH_PART2}"
+
+# For debugging
+echo $QUERY >&2
+
+echo $QUERY \
 |"$DIR"/sparql-select "$ENEXA_META_DATA_ENDPOINT" \
 |awk '(NR==2) { gsub(/^"|"$/, ""); print }'
