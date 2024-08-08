@@ -71,6 +71,10 @@ echo your_result >your_output_file
 enexa-add-file your_output_file "http://example.org/output-parameter-2"
 #+end_src
 
+The project documentation can be found [here](https://enexa.eu/documentation). 
+For the repository-specific documentation, visit [this link](https://enexa.eu/documentation/enexa-utils.html).
+
+
 ** Examples
 - [[https://github.com/EnexaProject/enexa-example-module][a simple example module]]
 - [[https://github.com/EnexaProject/enexa-dice-embeddings][DICE Embeddings]]
