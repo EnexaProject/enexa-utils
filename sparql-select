@@ -1,7 +1,13 @@
 #!/bin/sh
 set -eu
+echo "sparql select"
+echo "[sparql-select] PATH is: $PATH" >&2
+echo "[sparql-select] type curl: $(type curl 2>&1 || echo MISSING)" >&2
+echo "[sparql-select] which curl: $(which curl 2>&1 || echo MISSING)" >&2
+ls -l /usr/bin/curl /bin/curl /usr/local/bin/curl 2>&1 | grep curl >&2
 
 if type "curl" > /dev/null; then
+  echo "use curl"
   # curl exists, so let's use it
   curl \
     --silent \
@@ -9,10 +15,11 @@ if type "curl" > /dev/null; then
     --data-urlencode "query@-" \
     --get "$1"
 else
-  # try wget
+  echo "use wget"
   CONTENT_FILE=$(mktemp)
-  echo "query=" > $CONTENT_FILE
+  echo "query=" > "$CONTENT_FILE"
   # read piped data and append to file
-  cat >> $CONTENT_FILE
+  cat >> "$CONTENT_FILE"
   wget -q --header 'Accept: text/tab-separated-values' -O - --post-file "$CONTENT_FILE" "$1"
+  rm -f "$CONTENT_FILE"
 fi

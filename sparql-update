@@ -1,30 +1,30 @@
 #!/bin/sh
 OUTPUT=$(mktemp)
 
+echo "[sparql-select] PATH is: $PATH" >&2
+echo "[sparql-select] type curl: $(type curl 2>&1 || echo MISSING)" >&2
+echo "[sparql-select] which curl: $(which curl 2>&1 || echo MISSING)" >&2
+ls -l /usr/bin/curl /bin/curl /usr/local/bin/curl 2>&1 | grep curl >&2
+
 if type "curl" > /dev/null; then
-  # curl exists, so let's use it
-  curl \
-    --silent --show-error \
+  echo "use curl update"
+  curl --silent --show-error \
     --output "$OUTPUT" \
     --write-out "%{http_code}" \
-    --data-urlencode "update@-" \
-    --request POST "$1" \
-    |grep -q '^200$'
+    --header "Content-Type: application/sparql-update" \
+    --request POST \
+    --data-binary @- \
+    "$1" | grep -q '^200$'
 else
-  # try wget
-  CONTENT_FILE=$(mktemp)
-  echo "update=" > $CONTENT_FILE
-  # read piped data and append to file
-  cat >> $CONTENT_FILE
-  wget -q --post-file "$CONTENT_FILE" -O "$OUTPUT" "$1"
+  echo "[ERROR] curl required for SPARQL update" >&2
+  exit 1
 fi
 
 RET=$?
-
 if [ $RET -ne 0 ]; then
     echo "Error while sending SPARQL update"
     cat $OUTPUT >&2
 else
-    echo "Successfully send a SPARQL update"
+    echo "Successfully sent a SPARQL update"
 fi
 exit $RET

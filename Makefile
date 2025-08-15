@@ -1,7 +1,7 @@
 IMAGE:=hub.cs.upb.de/enexa/images/enexa-utils
-TAG:=$(IMAGE):1.0.0
-TAG2:=$(IMAGE):1.0
-TAG3:=$(IMAGE):1
+TAG:=$(IMAGE):1.0.0-debug2
+TAG2:=$(IMAGE):1.0-debug2
+TAG3:=$(IMAGE):1-debug2
 
 build:
 	docker build --tag $(TAG) .
